@@ -52,25 +52,25 @@ def assemble_spot_2(cnt, labels, members):
     pd.DataFrame of cell types x spots with no of cells
     """
     uni_labels = members.index
-    spot_expr = t.zeros(cnt.shape[1]).type(t.float32)
-    nUMIs = t.zeros((len(uni_labels))).type(t.float32)
-    for z in range(len(uni_labels)):
+    spot_expr = t.zeros(cnt.shape[1]).type(t.float32)#基因个数的0
+    nUMIs = t.zeros((len(uni_labels))).type(t.float32)#cell type个数的0
+    for z in range(len(uni_labels)):循环cell type的个数
         if members[z] > 0:
-            idx = np.where(labels == uni_labels[z])[0]
+            idx = np.where(labels == uni_labels[z])[0]#reference 中归类为该细胞类型的细胞index [1,4,6,8,10,23,100]...
             # pick random cells from type
             np.random.shuffle(idx)
-            idx = idx[0:int(members[z])]
+            idx = idx[0:int(members[z])]#选取该spot中一样个数的单细胞，获取他们的index
             # add transcripts to spot expression
-            z_expr = t.tensor((cnt.iloc[idx, :]).sum(axis=0).round().astype(np.float32))
+            z_expr = t.tensor((cnt.iloc[idx, :]).sum(axis=0).round().astype(np.float32))#获取这些细胞的umi count作为表达量
             spot_expr += z_expr
             nUMIs[z] = z_expr.sum()
     return (spot_expr, nUMIs)
 
 
 def assemble_st_2(cnt, labels, spots_members):
-    tot_spots = spots_members.shape[1]
-    st_cnt = np.zeros((tot_spots, cnt.shape[1]))
-    st_umis = np.zeros((tot_spots, spots_members.shape[0]))
+    tot_spots = spots_members.shape[1]#空间有多少个spots
+    st_cnt = np.zeros((tot_spots, cnt.shape[1]))#spots*多少个基因
+    st_umis = np.zeros((tot_spots, spots_members.shape[0]))#spots*cell types
     for spot in range(tot_spots):
         print("making spot no." + str(spot) + "...", flush=True)
         spot_data = assemble_spot_2(cnt, labels, spots_members.iloc[:, spot])
