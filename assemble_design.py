@@ -117,3 +117,4 @@ design_df.loc[design_df.index[design_df.density == 0], 'mean_ncells'] = high_nce
 
 out_name = out_dir + "synthetic_ST_seed" + lbl_gen_file.split("_")[-1].rstrip(".p") + "_" + "design" + ".csv"
 design_df.to_csv(out_name, sep=",", index=True, header=True)
+nn
